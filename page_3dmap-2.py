@@ -154,11 +154,11 @@ Z_base = np.maximum(0, (1 - R/6)**n) * 300  # 低矮平滑底
 
 # 頂部平帽，面積比底部0.6
 top_radius = 6 * 0.6
-Z_top = np.maximum(0, (1 - R/top_radius)**2) * 50
+Z_top = np.maximum(0, (1 - R/top_radius)**2) * 30
 
 # 火山口凹陷
-crater_radius = top_radius * 0.5
-Z_crater = -np.exp(-(R/crater_radius)**2) * 20  # 火山口凹陷20m
+crater_radius = top_radius * 1
+Z_crater = -np.exp(-(R/crater_radius)**2) * 100  # 火山口凹陷20m
 
 # 自然起伏
 Z_noise = np.random.rand(x_size, y_size) * 5
