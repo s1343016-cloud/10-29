@@ -50,43 +50,44 @@ st.pydeck_chart(r_hexagon)
 
 
 # ===============================================
-#             第二部分：台南 DEM 模擬
+#          第二個地圖：模擬台南 DEM
 # ===============================================
-st.title("🏞️ Pydeck 3D 地圖 (網格 - 台南 DEM 模擬)")
 
-# --- 1. 載入 DEM CSV 資料 ---
-df_dem = pd.read_csv("tainan_dem.csv")
+st.title("Pydeck 3D 地圖 (網格 - 台南 DEM 模擬)")
 
-# 確保欄位名稱一致
-df_dem.rename(columns={
-    "Longitude": "lon",
-    "Latitude": "lat",
-    "Elevation": "elevation"
-}, inplace=True)
+# --- 1. 模擬 DEM 網格資料 ---
+x, y = np.meshgrid(np.linspace(-1, 1, 50), np.linspace(-1, 1, 50))
+z = np.exp(-(x**2 + y**2) * 2) * 800 + np.random.rand(50, 50) * 200  # 模擬地形起伏
 
-st.write("📊 台南 DEM 資料預覽", df_dem.head())
+data_dem_list = []
+base_lat, base_lon = 23.0, 120.2  # 台南中心位置
+for i in range(50):
+    for j in range(50):
+        data_dem_list.append({
+            "lon": base_lon + x[i, j] * 0.15,
+            "lat": base_lat + y[i, j] * 0.15,
+            "elevation": z[i, j]
+        })
+df_dem = pd.DataFrame(data_dem_list)
 
-# --- 2. 設定 GridLayer ---
+# --- 2. 設定 Pydeck 圖層 (GridLayer) ---
 layer_grid = pdk.Layer(
-    'GridLayer',
+    "GridLayer",
     data=df_dem,
     get_position='[lon, lat]',
-    get_elevation_weight='elevation',
+    get_elevation_weight="elevation",
     elevation_scale=1,
     cell_size=2000,
     extruded=True,
     pickable=True
 )
 
-# --- 3. 設定視角 ---
+# --- 3. 設定視角 (View) ---
 view_state_grid = pdk.ViewState(
-    latitude=df_dem["lat"].mean(),
-    longitude=df_dem["lon"].mean(),
-    zoom=12,
-    pitch=50
+    latitude=base_lat, longitude=base_lon, zoom=9.5, pitch=50
 )
 
-# --- 4. 顯示地圖 ---
+# --- 4. 組合並顯示 ---
 r_grid = pdk.Deck(
     layers=[layer_grid],
     initial_view_state=view_state_grid,
