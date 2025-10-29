@@ -177,7 +177,7 @@ fig_surface = go.Figure(
 )
 
 fig_surface.update_layout(
-    title="誇張火山口低矮火山",
+    title="火山",
     width=800,
     height=700,
     scene=dict(
