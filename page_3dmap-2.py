@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 import requests
 
-st.title("互動式 3D 地圖展示：地球儀 + 富士山火山")
+st.title("互動式 3D 地圖展示：地球儀 + 火山")
 
 # ==============================
 # 1️⃣ 國家點資料
@@ -60,9 +60,9 @@ continent_colors = {
     "Oceania": "purple"
 }
 
-# -----------------------------
-# 3️⃣ 球面地球儀 + 各洲輪廓 + 國家點
-# -----------------------------
+# ==============================
+# 3️⃣ 球體地球儀 + 各洲輪廓 + 國家點
+# ==============================
 fig_sphere = go.Figure()
 
 # 球面
@@ -138,20 +138,22 @@ fig_sphere.update_layout(
 st.plotly_chart(fig_sphere, use_container_width=True)
 
 # ==============================
-# 4️⃣ 富士山火山 DEM + 高度滑桿
+# 4️⃣ 改良版富士山火山 DEM + 高度滑桿
 # ==============================
 height_scale = st.slider("調整高度比例", 0.1, 3.0, 1.0, 0.1)
 
-x_size, y_size = 50, 50
+x_size, y_size = 100, 100
 x = np.linspace(-3, 3, x_size)
 y = np.linspace(-3, 3, y_size)
 X, Y = np.meshgrid(x, y)
-
 R = np.sqrt(X**2 + Y**2)
-Z = np.maximum(0, 1 - R) * 1000      # 圓錐
-Z += np.exp(-R**2 / 0.1) * 100       # 頂部平滑
-Z += np.random.rand(x_size, y_size) * 20  # 微小起伏
-Z *= height_scale  # 高度比例
+
+# 改良富士山公式
+n = 2.5  # 底部控制
+Z_base = np.maximum(0, (1 - R)**n) * 1000
+Z_top = np.exp(-R**2 / 0.08) * 150  # 頂部略平
+Z_noise = np.random.rand(x_size, y_size) * 20
+Z = (Z_base + Z_top + Z_noise) * height_scale
 
 fig_surface = go.Figure(
     data=[
