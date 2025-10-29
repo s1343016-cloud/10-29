@@ -140,7 +140,7 @@ st.plotly_chart(fig_sphere, use_container_width=True)
 # ==============================
 # 4️⃣ 富士山火山 DEM + 高度滑桿
 # ==============================
-height_scale = st.slider("調整富士山高度比例", 0.1, 3.0, 1.0, 0.1)
+height_scale = st.slider("調整高度比例", 0.1, 3.0, 1.0, 0.1)
 
 x_size, y_size = 50, 50
 x = np.linspace(-3, 3, x_size)
@@ -166,7 +166,7 @@ fig_surface = go.Figure(
 )
 
 fig_surface.update_layout(
-    title="富士山 3D 火山地形",
+    title=" 3D 火山地形",
     width=800,
     height=700,
     scene=dict(
