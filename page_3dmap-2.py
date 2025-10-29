@@ -149,20 +149,19 @@ X, Y = np.meshgrid(x, y)
 R = np.sqrt(X**2 + Y**2)
 
 # 底部寬錐
+# 底部寬錐
 n = 2.0
 Z_base = np.maximum(0, (1 - R)**n) * 1000
 
-# 火山口：頂部凹陷
-Z_crater = -np.exp(-R**2 / 0.02) * 350
-
-# 頂部略高的小帽
-Z_top = np.exp(-R**2 / 0.08) * 100
+# 頂部略平
+Z_top = np.exp(-R**2 / 0.08) * 150  # 高度小帽，不要火山口
 
 # 自然起伏
 Z_noise = np.random.rand(x_size, y_size) * 20
 
 # 最終高度
-Z = (Z_base + Z_top + Z_crater + Z_noise) * height_scale
+Z = (Z_base + Z_top + Z_noise) * height_scale
+
 
 fig_surface = go.Figure(
     data=[
