@@ -168,7 +168,7 @@ fig_surface = go.Figure(
 )
 
 fig_surface.update_layout(
-    title=" 3D 火山地形",
+    title=" 3D 富士山火山地形",
     width=800,
     height=700,
     scene=dict(
