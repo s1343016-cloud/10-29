@@ -56,4 +56,38 @@ fig_geo = px.scatter_mapbox(
     mapbox_style="satellite"
 )
 
-st.plotly_chart(fig_geo, use_container_width=True)
+# ==============================
+# 2️⃣ 模擬 DEM 3D 火山地形
+# ==============================
+x_size, y_size = 50, 50
+x = np.linspace(-3, 3, x_size)
+y = np.linspace(-3, 3, y_size)
+X, Y = np.meshgrid(x, y)
+Z = np.exp(-X**2 - Y**2) * 1000  # 高斯山峰
+Z += np.random.rand(x_size, y_size) * 50  # 隨機起伏
+
+with st.expander("3D 模擬火山地形"):
+    fig_surface = go.Figure(
+        data=[
+            go.Surface(
+                z=Z,
+                colorscale="Viridis",
+                showscale=True,
+                lighting=dict(ambient=0.6, diffuse=0.8, specular=0.5),
+                contours={"z": {"show": True, "start": 200, "end": 1000, "size": 100}}
+            )
+        ]
+    )
+
+    fig_surface.update_layout(
+        title="模擬火山 3D 地形圖",
+        width=800,
+        height=700,
+        scene=dict(
+            xaxis_title='X',
+            yaxis_title='Y',
+            zaxis_title='高度 (Z)'
+        )
+    )
+
+    st.plotly_chart(fig_surface, use_container_width=True)
