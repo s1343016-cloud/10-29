@@ -205,3 +205,8 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# ------------------------------------
+# Streamlit 機密檔案 (*** 最重要 ***)
+# ------------------------------------
+.streamlit/secrets.toml
