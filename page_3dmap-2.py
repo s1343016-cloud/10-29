@@ -138,7 +138,7 @@ fig_sphere.update_layout(
 st.plotly_chart(fig_sphere, use_container_width=True)
 
 # ==============================
-# 4️⃣ 自然富士山 DEM + 高度滑桿
+# 4️⃣ 自然DEM + 高度滑桿
 # ==============================
 height_scale = st.slider("調整高度比例", 0.1, 3.0, 1.0, 0.1)
 
@@ -150,10 +150,10 @@ R = np.sqrt(X**2 + Y**2)
 
 # 底部寬錐
 n = 2.0
-Z_base = np.maximum(0, (1 - R)**n) * 1000
+Z_base = np.maximum(0, (1 - R)**n) * 0
 
-# 頂部略平
-Z_top = np.exp(-R**2 / 0.08) * 150  # 保留自然小帽，不做火山口
+# 頂部略平小帽
+Z_top = np.exp(-R**2 / 0.08) * 150
 
 # 自然起伏
 Z_noise = np.random.rand(x_size, y_size) * 20
@@ -185,3 +185,4 @@ fig_surface.update_layout(
 )
 
 st.plotly_chart(fig_surface, use_container_width=True)
+
