@@ -3,92 +3,93 @@ import pandas as pd
 import numpy as np
 import pydeck as pdk
 
-st.title("Pydeck 3D 地圖 (向量 - 密度圖)")
+# ===============================================
+#             第一部分：彰化熱度圖
+# ===============================================
+st.title("🌇 Pydeck 3D 地圖 (向量 - 彰化熱度圖)")
 
-# 0. 檢查 Mapbox 金鑰是否存在於 Secrets 中 (名稱應為 MAPBOX_API_KEY)
+# 0. 檢查 Mapbox 金鑰是否存在於 Secrets 中
 if "MAPBOX_API_KEY" not in st.secrets:
     st.error("Mapbox API Key (名稱需為 MAPBOX_API_KEY) 未設定！請在雲端 Secrets 中設定。")
     st.stop()
 
-# --- 1. 生成範例資料 (向量) ---
+# --- 1. 生成範例資料（模擬彰化市隨機點） ---
+# 彰化市中心大約位置：經度 120.541, 緯度 24.074
 data = pd.DataFrame({
-    'lat': 25.0478 + np.random.randn(1000) / 50,
-    'lon': 121.5170 + np.random.randn(1000) / 50,
+    'lat': 24.074 + np.random.randn(1000) / 80,  # 緯度隨機擴散
+    'lon': 120.541 + np.random.randn(1000) / 80, # 經度隨機擴散
 })
 
-# --- 2. 設定 Pydeck 圖層 (Layer) ---
-layer_hexagon = pdk.Layer( # 稍微改個名字避免混淆
+# --- 2. 設定 HexagonLayer ---
+layer_hexagon = pdk.Layer(
     'HexagonLayer',
     data=data,
     get_position='[lon, lat]',
-    radius=100,
-    elevation_scale=4,
+    radius=120,
+    elevation_scale=5,
     elevation_range=[0, 1000],
     pickable=True,
     extruded=True,
 )
 
-# --- 3. 設定攝影機視角 (View State) ---
-view_state_hexagon = pdk.ViewState( # 稍微改個名字避免混淆
-    latitude=25.0478,
-    longitude=121.5170,
+# --- 3. 設定視角 ---
+view_state_hexagon = pdk.ViewState(
+    latitude=24.074,
+    longitude=120.541,
     zoom=12,
     pitch=50,
 )
 
-# --- 4. 組合圖層和視角並顯示 (第一個地圖) ---
-r_hexagon = pdk.Deck( # 稍微改個名字避免混淆
+# --- 4. 顯示地圖 ---
+r_hexagon = pdk.Deck(
     layers=[layer_hexagon],
     initial_view_state=view_state_hexagon,
-    # mapbox_key=MAPBOX_KEY, # <-- 移除
     tooltip={"text": "這個區域有 {elevationValue} 個熱點"}
 )
 st.pydeck_chart(r_hexagon)
 
 
 # ===============================================
-#          第二個地圖：模擬 DEM
+#             第二部分：台南 DEM 模擬
 # ===============================================
+st.title("🏞️ Pydeck 3D 地圖 (網格 - 台南 DEM 模擬)")
 
-st.title("Pydeck 3D 地圖 (網格 - DEM 模擬)")
+# --- 1. 載入 DEM CSV 資料 ---
+df_dem = pd.read_csv("tainan_dem.csv")
 
-# --- 1. 模擬 DEM 網格資料 ---
-x, y = np.meshgrid(np.linspace(-1, 1, 50), np.linspace(-1, 1, 50))
-z = np.exp(-(x**2 + y**2) * 2) * 1000
+# 確保欄位名稱一致
+df_dem.rename(columns={
+    "Longitude": "lon",
+    "Latitude": "lat",
+    "Elevation": "elevation"
+}, inplace=True)
 
-data_dem_list = [] # 修正: 建立一個列表來收集字典
-base_lat, base_lon = 25.0, 121.5
-for i in range(50):
-    for j in range(50):
-        data_dem_list.append({ # 修正: 將字典附加到列表中
-            "lon": base_lon + x[i, j] * 0.1,
-            "lat": base_lat + y[i, j] * 0.1,
-            "elevation": z[i, j]
-        })
-df_dem = pd.DataFrame(data_dem_list) # 從列表創建 DataFrame
+st.write("📊 台南 DEM 資料預覽", df_dem.head())
 
-# --- 2. 設定 Pydeck 圖層 (GridLayer) ---
-layer_grid = pdk.Layer( # 稍微改個名字避免混淆
+# --- 2. 設定 GridLayer ---
+layer_grid = pdk.Layer(
     'GridLayer',
     data=df_dem,
     get_position='[lon, lat]',
-    get_elevation_weight='elevation', # 使用 'elevation' 欄位當作高度
+    get_elevation_weight='elevation',
     elevation_scale=1,
     cell_size=2000,
     extruded=True,
-    pickable=True # 加上 pickable 才能顯示 tooltip
+    pickable=True
 )
 
-# --- 3. 設定視角 (View) ---
-view_state_grid = pdk.ViewState( # 稍微改個名字避免混淆
-    latitude=base_lat, longitude=base_lon, zoom=10, pitch=50
+# --- 3. 設定視角 ---
+view_state_grid = pdk.ViewState(
+    latitude=df_dem["lat"].mean(),
+    longitude=df_dem["lon"].mean(),
+    zoom=12,
+    pitch=50
 )
 
-# --- 4. 組合並顯示 (第二個地圖) ---
-r_grid = pdk.Deck( # 稍微改個名字避免混淆
+# --- 4. 顯示地圖 ---
+r_grid = pdk.Deck(
     layers=[layer_grid],
     initial_view_state=view_state_grid,
-    # mapbox_key=MAPBOX_KEY, # <--【修正點】移除這裡的 mapbox_key
-    tooltip={"text": "海拔高度: {elevationValue} 公尺"} # GridLayer 用 elevationValue
+    tooltip={"text": "海拔高度: {elevationValue} 公尺"}
 )
 st.pydeck_chart(r_grid)
