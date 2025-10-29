@@ -42,7 +42,7 @@ df_geo = pd.DataFrame({
     "lon": lon
 })
 
-mapbox_token = "YOUR_MAPBOX_TOKEN"  # <- 換成你的 Mapbox token
+mapbox_token = "pk.eyJ1IjoiczEzNDMwMTYiLCJhIjoiY21oYmJkZGJ5MHdxZDJqcHg1NWk2NGp5MyJ9.HqfgX8ODaAUpLIWV3R2TQg"  # <- 換成你的 Mapbox token
 px.set_mapbox_access_token(mapbox_token)
 
 with st.expander("3D 地球儀 (Mapbox 衛星底圖)"):
