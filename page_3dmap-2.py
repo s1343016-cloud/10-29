@@ -140,23 +140,23 @@ st.plotly_chart(fig_sphere, use_container_width=True)
 # ==============================
 # 4️⃣ 自然DEM + 高度滑桿
 # ==============================
-height_scale = st.slider("調整高度比例", 0.1, 3.0, 1.0, 0.1)
+height_scale = st.slider("調整高度比例", 0.1, 3.0, 0.5, 0.1)  # 預設 0.5，低矮感
 
 x_size, y_size = 100, 100
-x = np.linspace(-3, 3, x_size)
-y = np.linspace(-3, 3, y_size)
+x = np.linspace(-5, 5, x_size)   # X範圍加大 → 底更寬
+y = np.linspace(-5, 5, y_size)   # Y範圍加大 → 底更寬
 X, Y = np.meshgrid(x, y)
 R = np.sqrt(X**2 + Y**2)
 
-# 底部寬錐
-n = 2.0
-Z_base = np.maximum(0, (1 - R)**n) * 0
+# 底部寬錐（n 越小越平坦）
+n = 1.5
+Z_base = np.maximum(0, (1 - R/3)**n) * 400  # 高度低 → 400米基礎
 
 # 頂部略平小帽
-Z_top = np.exp(-R**2 / 0.08) * 150
+Z_top = np.exp(-R**2 / 0.1) * 50  # 小帽不高
 
 # 自然起伏
-Z_noise = np.random.rand(x_size, y_size) * 20
+Z_noise = np.random.rand(x_size, y_size) * 10  # 小起伏
 
 # 最終高度
 Z = (Z_base + Z_top + Z_noise) * height_scale
@@ -168,13 +168,13 @@ fig_surface = go.Figure(
             colorscale="Viridis",
             showscale=True,
             lighting=dict(ambient=0.6, diffuse=0.8, specular=0.5),
-            contours={"z": {"show": True, "start": 200, "end": 1000*height_scale, "size": 100}}
+            contours={"z": {"show": True, "start": 50, "end": 400*height_scale, "size": 50}}
         )
     ]
 )
 
 fig_surface.update_layout(
-    title=" 3D 火山地形",
+    title="3D 火山",
     width=800,
     height=700,
     scene=dict(
@@ -185,4 +185,3 @@ fig_surface.update_layout(
 )
 
 st.plotly_chart(fig_surface, use_container_width=True)
-
