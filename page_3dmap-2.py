@@ -1,14 +1,10 @@
 import streamlit as st
 import plotly.express as px
-import plotly.graph_objects as go
 import pandas as pd
-import numpy as np
 
-st.title("互動式 3D 地圖展示 (20 個國家)")
+st.title("3D 地球儀 (Mapbox 衛星底圖)")
 
-# ==============================
-# 1️⃣ 3D 地球儀 (20 個真實國家)
-# ==============================
+# --- 20 個真實國家資料 ---
 countries = [
     "Taiwan", "USA", "China", "France", "Brazil", "Australia", "India", "Japan",
     "Germany", "South Africa", "Russia", "Canada", "Mexico", "Italy", "Spain",
@@ -41,49 +37,23 @@ df_geo = pd.DataFrame({
     "pop": pop
 })
 
-with st.expander("3D 地球儀 (20 國家)"):
-    fig_geo = px.scatter_geo(
-        df_geo,
-        locations="iso_alpha",
-        color="continent",
-        hover_name="country",
-        size="pop",
-        projection="orthographic"
-    )
-    st.plotly_chart(fig_geo, use_container_width=True)
+# --- 使用 Mapbox 衛星底圖 ---
+mapbox_token = "pk.eyJ1IjoiczEzNDMwMTYiLCJhIjoiY21oYmJkZGJ5MHdxZDJqcHg1NWk2NGp5MyJ9.HqfgX8ODaAUpLIWV3R2TQg"  # <- 換成你的 Mapbox token
 
-# ==============================
-# 2️⃣ 模擬 DEM Surface 資料
-# ==============================
-x_size, y_size = 50, 50
-x = np.linspace(-3, 3, x_size)
-y = np.linspace(-3, 3, y_size)
-X, Y = np.meshgrid(x, y)
-Z = np.exp(-X**2 - Y**2) * 1000  # 模擬山峰
-Z += np.random.rand(x_size, y_size) * 50  # 隨機起伏
+px.set_mapbox_access_token(mapbox_token)
 
-with st.expander("3D 模擬火山地形"):
-    fig_surface = go.Figure(
-        data=[
-            go.Surface(
-                z=Z,
-                colorscale="Viridis",
-                showscale=True,
-                lighting=dict(ambient=0.6, diffuse=0.8, specular=0.5),
-                contours={"z": {"show": True, "start": 200, "end": 1000, "size": 100}}
-            )
-        ]
-    )
+fig_geo = px.scatter_mapbox(
+    df_geo,
+    lat=[23.7, 38.9, 35.9, 46.2, -14.2, -25.3, 20.6, 36.0, 51.2, -30.6,
+         61.5, 56.1, 23.6, 41.9, 40.4, 26.8, -38.4, 36.5, 55.4, 24.7],  # 緯度
+    lon=[121.0, -77.0, 104.1, 2.2, -51.9, 133.8, 78.9, 138.2, 10.4, 22.9,
+         105.3, -106.3, -102.5, 12.6, -3.7, 30.8, -64.2, 127.8, -3.4, 46.7], # 經度
+    color="continent",
+    size="pop",
+    hover_name="country",
+    zoom=0,
+    height=600,
+    mapbox_style="satellite"
+)
 
-    fig_surface.update_layout(
-        title="模擬火山 3D 地形圖",
-        width=800,
-        height=700,
-        scene=dict(
-            xaxis_title='X',
-            yaxis_title='Y',
-            zaxis_title='高度 (Z)'
-        )
-    )
-
-    st.plotly_chart(fig_surface, use_container_width=True)
+st.plotly_chart(fig_geo, use_container_width=True)
