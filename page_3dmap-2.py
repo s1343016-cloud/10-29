@@ -151,7 +151,7 @@ R = np.sqrt(X**2 + Y**2)
 # 底部寬錐
 # 底部寬錐
 n = 2.0
-Z_base = np.maximum(0, (1 - R)**n) * 1000
+Z_base = np.maximum(0, (1 - R)**n) * 0
 
 # 頂部略平
 Z_top = np.exp(-R**2 / 0.08) * 150  # 高度小帽，不要火山口
