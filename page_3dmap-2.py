@@ -140,7 +140,7 @@ st.plotly_chart(fig_sphere, use_container_width=True)
 # ==============================
 # 4️⃣ 自然DEM + 高度滑桿
 # ==============================
-height_scale = st.slider("調整高度比例", 0.1, 3.0, 0.5, 0.1)  # 預設0.5，看得清楚
+height_scale = st.slider("調整高度比例", 0.1, 3.0, 0.5, 0.1)
 
 x_size, y_size = 100, 100
 x = np.linspace(-6, 6, x_size)
@@ -150,15 +150,15 @@ R = np.sqrt(X**2 + Y**2)
 
 # 底部寬錐
 n = 1.2
-Z_base = np.maximum(0, (1 - R/6)**n) * 300
+Z_base = np.maximum(0, (1 - R/6)**n) * 300  # 寬底低矮
 
-# 頂部小帽
+# 頂部小帽 (面積比底部0.6)
 top_radius = 6 * 0.6
-Z_top = np.maximum(0, (1 - R/top_radius)**2) * 30
+Z_top = np.maximum(0, (1 - R/top_radius)**2) * 30  # 小帽高度低
 
-# 火山口凹陷，半徑略大於頂部半徑，深度明顯
+# 火山口凹陷 (加大半徑與深度)
 crater_radius = top_radius * 1.2
-Z_crater = -np.exp(-(R/crater_radius)**2) * 100
+Z_crater = -np.exp(-(R/crater_radius)**2) * 150  # 深度150米，更明顯
 
 # 自然起伏
 Z_noise = np.random.rand(x_size, y_size) * 5
@@ -177,7 +177,7 @@ fig_surface = go.Figure(
 )
 
 fig_surface.update_layout(
-    title="火山口",
+    title="誇張火山口低矮火山",
     width=800,
     height=700,
     scene=dict(
